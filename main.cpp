@@ -77,7 +77,7 @@ public:
     QColor drawingColor;
     QPoint previousPoint;
     QPoint currentPoint;
-    QList<QLine> listOfLines;  // Nova lista za pohranu crtaćih linija, PREKO VEKTORA
+    QList<QLine> listOfLines;
 
 public slots:
     void EditNoviTekstMenu();
@@ -150,7 +150,7 @@ void MyMainWindow::keyPressEvent(QKeyEvent *event) {
         break;
     case Qt::Key_Down: MyLabel->move(MyLabel->pos().x(), MyLabel->pos().y() + 1);
         break;
-//mogucnost kretanja i sa WSAD
+
     case Qt::Key_A : MyLabel->move(MyLabel->pos().x() - 1, MyLabel->pos().y());
         break;
     case Qt::Key_D: MyLabel->move(MyLabel->pos().x() + 1, MyLabel->pos().y());
@@ -258,7 +258,6 @@ void MyMainWindow::ChangeFontMenu() {
     bool ok;
     QFont font = QFontDialog::getFont(&ok, MyLabel->font(), this, tr("Select Font"));
     if (ok) {
-        // Stvaranje QUndoCommand i dodavanje na undoStack
         QUndoCommand* command = new ChangeFontCommand(MyLabel, MyLabel->font(), font);
         undoStack.push(command);
 
@@ -311,13 +310,13 @@ void MyMainWindow::EnableDrawingOnBackground() {
 void MyMainWindow::mouseReleaseEvent(QMouseEvent* event) {
     if (drawingEnabled && event->button() == Qt::LeftButton) {
         drawingEnabled = false;
-        setCursor(Qt::ArrowCursor);//promjeni izgled kursora ako smo usli u crtanje
+        setCursor(Qt::ArrowCursor);
     }
 }
 
 void MyMainWindow::ClearingDrawing() {
     drawingEnabled = false;
-    listOfLines.clear();//ocisti crtez sa liste linija
+    listOfLines.clear();
     update();
 }
 
@@ -325,7 +324,7 @@ void MyMainWindow::mouseMoveEvent(QMouseEvent* event) {
     if (drawingEnabled && (event->buttons() & Qt::LeftButton)) {
         previousPoint = currentPoint;
         currentPoint = event->pos();
-        listOfLines.append(QLine(previousPoint, currentPoint));  // Dodajte crtež u listu linija
+        listOfLines.append(QLine(previousPoint, currentPoint));
         update();
     }
 }
@@ -379,17 +378,14 @@ MyMainWindow::MyMainWindow() {
     connect(ChangeFont, &QAction::triggered, this, &MyMainWindow::ChangeFontMenu);
     EditMenu->addAction(ChangeFont);
 
-    //promjena pozadinske boje
     ChangeBackgroundColorAll = new QAction(tr("Change Background Color (All)"), this);
     connect(ChangeBackgroundColorAll, &QAction::triggered, this, &MyMainWindow::ChangeBackgroundColorAllMenu);
     EditMenu->addAction(ChangeBackgroundColorAll);
-    //DrawOnBackground
 
     DrawOnBackground=new QAction(tr("Draw on Background"), this);
     connect(DrawOnBackground,&QAction::triggered, this, &MyMainWindow::EnableDrawingOnBackground);
     EditMenu->addAction(DrawOnBackground);
 
-    //brisanje bojanja
     ClearDrawing = new QAction(tr("Clear Drawing"), this);
     connect(ClearDrawing, &QAction::triggered, this, &MyMainWindow::ClearingDrawing);
     EditMenu->addAction(ClearDrawing);
@@ -403,6 +399,5 @@ int main(int argc, char **argv) {
     QApplication app(argc, argv);
     MyMainWindow mainWindow;
     mainWindow.resize(300, 150);
-    mainWindow.show();// sluzi z aprikaz glavnog prozora
-    return app.exec();//petlja  aobradu podataka, zavrsava s pozivom exit!
-}
+    mainWindow.show();
+    return app.exec();
